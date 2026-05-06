@@ -1,0 +1,17 @@
+{
+  "repo": "anchor-trade-orderbook-mesh",
+  "thresholds": {
+    "signal": 4,
+    "slack": 1,
+    "confidence": 2,
+    "drag": 4,
+    "ship": 154,
+    "watch": 103
+  },
+  "terms": [
+    "spread pressure",
+    "fill risk",
+    "portfolio drift",
+    "quote width"
+  ]
+}
