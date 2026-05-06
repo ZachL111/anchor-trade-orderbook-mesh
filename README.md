@@ -1,67 +1,40 @@
 # anchor-trade-orderbook-mesh
 
-`anchor-trade-orderbook-mesh` treats trading systems as a local verification problem. The Zig implementation is intentionally narrow, but the fixtures and notes make the behavior explicit.
+`anchor-trade-orderbook-mesh` is a compact Zig repository for trading systems, centered on this goal: Design a Zig verification harness for orderbook systems, covering stream reduction, windowed input fixtures, and failure-oriented tests.
 
-## Anchor Trade Orderbook Mesh Checkpoints
+## Why It Exists
 
-Treat the compact fixture as the contract and the extended examples as a scratchpad. The code should stay boring enough that a change in behavior is obvious from the test output.
+I want this repository to be useful as a quick reading exercise: fixtures first, implementation second, verifier last.
 
-## Useful Pieces
+## Anchor Trade Orderbook Mesh Review Notes
 
-- Includes extended examples for fills, including `surge` and `degraded`.
-- Documents portfolio pressure tradeoffs in `docs/operations.md`.
-- Runs locally with a single verification command and no external credentials.
-- Stores project constants and verification metadata in `metadata/project.json`.
-- Adds a repository audit script that checks structure before running the language verifier.
+`stale` and `edge` are the cases worth reading first. They show the optimistic and cautious ends of the fixture.
 
-## What This Is For
+## Features
 
-The goal is to capture the core behavior in code and make the surrounding assumptions obvious. A reader should be able to run the verifier, open the fixtures, and understand why each decision was made.
-
-## Project Layout
-
-- `src`: primary implementation
-- `fixtures`: compact golden scenarios
-- `examples`: expanded scenario set
-- `metadata`: project constants and verification metadata
-- `docs`: operations and extension notes
-- `scripts`: local verification and audit commands
+- `fixtures/domain_review.csv` adds cases for spread pressure and fill risk.
+- `metadata/domain-review.json` records the same cases in structured form.
+- `config/review-profile.json` captures the read order and the two review questions.
+- `examples/anchor-trade-orderbook-walkthrough.md` walks through the case spread.
+- The Zig code includes a review path for `spread pressure` and `portfolio drift`.
+- `docs/field-notes.md` explains the strongest and weakest cases.
 
 ## Architecture Notes
 
-The design is intentionally direct: parse or construct a signal, score it, classify it, and verify the expected branch. This makes the repository useful for studying trading systems behavior without needing a service or database unless the language project itself is SQL. The Zig version uses compile-time constants and native test blocks for fast local checks.
+The repository has two validation layers: the original compact policy fixture and the domain review fixture. They are separate so one can change without hiding failures in the other.
 
-## Local Workflow
+The added Zig path is deliberately direct, with fixtures doing most of the explaining.
+
+## Usage
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1
 ```
 
-This runs the language-level build or test path against the compact fixture set.
+## Tests
 
-## Case Study
+That command is also the regression path. It verifies the domain cases and catches mismatches between the CSV, metadata, and code.
 
-`examples/extended_cases.csv` adds six named cases. I kept the names plain so failures are easy to read in a terminal: baseline, pressure, surge, degraded, recovery, and boundary.
+## Limitations And Roadmap
 
-## Quality Gate
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/audit.ps1
-```
-
-The audit command checks repository structure and README constraints before it delegates to the verifier.
-
-## Scope
-
-The scoring model is simple by design. More domain-specific behavior should be added through explicit adapters or extra fixture classes rather than hidden constants.
-
-## Expansion Ideas
-
-- Add a loader for `examples/extended_cases.csv` and promote selected cases into the language test suite.
-- Add a short report command that prints the score breakdown for a single scenario.
-- Add malformed input fixtures so the failure path is as visible as the happy path.
-- Add one more trading systems fixture that focuses on a malformed or borderline input.
-
-## Tooling
-
-The only required setup is the local Zig toolchain. After cloning, stay in the repo root so fixture paths resolve correctly.
+This remains a local project with deterministic fixtures. It does not depend on credentials, hosted services, or live data. Future work should add richer malformed inputs before widening the public API.
